@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.chatop.api.dto.LoginDto;
 import com.chatop.api.dto.RegisterDto;
 import com.chatop.api.model.AppUser;
 import com.chatop.api.repository.AppUserRepository;
@@ -48,6 +49,15 @@ public class AppUserService implements UserDetailsService {
                         new UsernamePasswordAuthenticationToken(registerDto.getEmail(), registerDto.getPassword()));
 
         String jwtToken = jwtService.generateToken(newAppUser);
+        return new TokenResponse(jwtToken);
+    }
+
+    public TokenResponse connectUser(LoginDto loginDto) {
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+
+        AppUser appUser = appUserRepository.findByEmail(loginDto.getEmail()).orElseThrow();
+        String jwtToken = jwtService.generateToken(appUser);
         return new TokenResponse(jwtToken);
     }
 }
