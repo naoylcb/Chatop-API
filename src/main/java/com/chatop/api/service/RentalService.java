@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.chatop.api.dto.RentalCreateDto;
 import com.chatop.api.dto.RentalDto;
+import com.chatop.api.dto.RentalUpdateDto;
 import com.chatop.api.model.AppUser;
 import com.chatop.api.model.Rental;
 import com.chatop.api.repository.RentalRepository;
@@ -71,6 +72,14 @@ public class RentalService {
         rentalRepository.save(rental);
 
         return new MessageResponse("Rental created !");
+    }
+
+    public MessageResponse updateRental(Integer id, RentalUpdateDto rentalUpdateDto) {
+        Rental rental = this.getRentalById(id).orElseThrow();
+        modelMapper.map(rentalUpdateDto, rental);
+        rentalRepository.save(rental);
+
+        return new MessageResponse("Rental updated !");
     }
 
     private String uploadFile(MultipartFile file) {

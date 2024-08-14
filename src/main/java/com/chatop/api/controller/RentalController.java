@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import jakarta.validation.Valid;
 
 import com.chatop.api.dto.RentalCreateDto;
 import com.chatop.api.dto.RentalDto;
+import com.chatop.api.dto.RentalUpdateDto;
 import com.chatop.api.responses.BadRequestResponse;
 import com.chatop.api.responses.MessageResponse;
 import com.chatop.api.responses.RentalsResponse;
@@ -66,6 +68,21 @@ public class RentalController {
     public ResponseEntity<MessageResponse> addRental(@Valid @ModelAttribute RentalCreateDto rentalCreateDto,
             Authentication authentication) {
         MessageResponse response = rentalService.createRental(rentalCreateDto, authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(description = "Update a rental.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponse.class)) }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestResponse.class)) })
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<MessageResponse> updateRental(@PathVariable Integer id,
+            @Valid @ModelAttribute RentalUpdateDto rentalUpdateDto) {
+        MessageResponse response = rentalService.updateRental(id, rentalUpdateDto);
         return ResponseEntity.ok(response);
     }
 }
