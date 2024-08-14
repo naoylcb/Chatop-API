@@ -1,12 +1,16 @@
 package com.chatop.api.controller;
 
 import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import com.chatop.api.dto.LoginDto;
 import com.chatop.api.dto.RegisterDto;
+import com.chatop.api.dto.UserDto;
 import com.chatop.api.responses.BadRequestResponse;
 import com.chatop.api.responses.TokenResponse;
 import com.chatop.api.service.AppUserService;
@@ -53,5 +58,17 @@ public class LoginController {
         TokenResponse response = appUserService.connectUser(loginDto);
         return ResponseEntity.ok(response);
 
+    }
+
+    @Operation(description = "Get current user (by the jwt token).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class)) }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(Authentication authentication) {
+        UserDto userDto = appUserService.getUserInfoByEmail(authentication.getName());
+        return ResponseEntity.ok(userDto);
     }
 }
